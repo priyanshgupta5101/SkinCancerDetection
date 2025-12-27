@@ -1,7 +1,9 @@
 import google.generativeai as genai
 import os
 
-KEY = "AIzaSyAy4zyruCaN4YhPYpsuZpkPs57rIjdI5Ec"
+KEY = os.getenv("GEMINI_API_KEY")
+if not KEY:
+    KEY = "dummy_key" # Prevent crash on simple run, but API calls will fail
 genai.configure(api_key=KEY)
 
 generation_config = {

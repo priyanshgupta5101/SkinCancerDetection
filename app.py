@@ -31,7 +31,12 @@ def page_not_found(e):
     return render_template('404.html')
 
 def gemini(user_input):
-    KEY = "AIzaSyAy4zyruCaN4YhPYpsuZpkPs57rIjdI5Ec"
+    KEY = os.getenv("GEMINI_API_KEY")
+    if not KEY:
+        print("Warning: GEMINI_API_KEY not found in environment variables.")
+        # Setup dummy key to avoid immediate crash on configure, but calls will fail
+        KEY = "dummy_key"
+        
     genai.configure(api_key=KEY)
 
     generation_config = {
