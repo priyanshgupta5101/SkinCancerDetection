@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Report | DERMA AI</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- html2pdf CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .report-container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .report-header {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .report-title {
+            font-size: 24px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .report-meta {
+            font-size: 14px;
+            color: #666;
+            text-align: right;
+        }
+
+        .report-body {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .report-image {
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .report-image img {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .report-details {
+            flex: 1;
+        }
+
+        .result-box {
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .result-cancer {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+
+        .result-noncancer {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .recommendation-box {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .disclaimer {
+            font-size: 12px;
+            color: #999;
+            margin-top: 40px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .no-print {
+                display: none;
+            }
+
+            .report-container {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="no-print">
+        <div class="header-content">
+            <h1>DERMA AI</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/chatbot">AI Assistant</a>
+                <a href="/model" class="active">Analysis</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="no-print" style="text-align: right; max-width: 800px; margin: 0 auto 20px auto;">
+            <button onclick="downloadPDF()" class="btn">Download PDF Report</button>
+        </div>
+
+        <div id="report-content" class="report-container">
+            <div class="report-header">
+                <div class="report-title">Medical Analysis Report</div>
+                <div class="report-meta">
+                    <div>Date: <span id="current-date"></span></div>
+                    <div>Report ID: #21398</div>
+                </div>
+            </div>
+
+            <div class="report-body">
+                <div class="report-image">
+                    <p><strong>Analyzed Image:</strong></p>
+                    <img src="uploads/not_an_image.txt" alt="Analyzed Skin Lesion">
+                </div>
+                <div class="report-details">
+                    <p><strong>Analysis Result:</strong></p>
+                    <div
+                        class="result-box result-cancer">
+                        <h2 style="margin: 0;">Error: cannot identify image file &#39;D:\\Project Final Year\\Skin-Cancer-Detection-main\\uploads\\not_an_image.txt&#39;</h2>
+                        <p style="margin: 10px 0 0 0;">Confidence: 0.00%</p>
+                    </div>
+
+                    <p><strong>Details:</strong></p>
+                    <p>An error occurred during analysis.</p>
+                </div>
+            </div>
+
+            <div class="recommendation-box">
+                <strong>Recommendation:</strong>
+                
+                <p>An error occurred while processing your image. Please ensure you uploaded a valid image file and try
+                    again.</p>
+                
+            </div>
+
+            <div class="disclaimer">
+                <strong>DISCLAIMER:</strong> This report is generated by an AI system (DERMA AI) and is for educational
+                and screening purposes only. It does not constitute a medical diagnosis. Always consult a qualified
+                healthcare professional for medical advice.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set current date
+        const now = new Date();
+        document.getElementById('current-date').textContent = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+
+        function downloadPDF() {
+            const element = document.getElementById('report-content');
+            const opt = {
+                margin: 10,
+                filename: 'Skin_Cancer_Analysis_Report.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+</body>
+
+</html>

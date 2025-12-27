@@ -1,0 +1,10 @@
+chatterbot==1.0.4
+flask
+tensorflow
+keras
+google-generativeai
+torch
+torchvision
+transformers
+Pillow
+numpy

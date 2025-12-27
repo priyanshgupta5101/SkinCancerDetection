@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DERMA AI | Skin Cancer Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>DERMA AI</h1>
+            <nav>
+                <a href="/" class="active">Home</a>
+                <a href="/chatbot">AI Assistant</a>
+                <a href="/model">Analysis</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h2>Early Detection Saves Lives</h2>
+            <p>Empowering you with advanced AI technology for early skin cancer detection and personalized health
+                guidance.</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>AI Skin Analysis</h3>
+                <p>Upload an image of a skin lesion to get an instant risk assessment using our advanced deep learning
+                    models.</p>
+                <a href="/model"><button class="btn">Start Analysis</button></a>
+            </div>
+
+            <div class="card">
+                <h3>Health Assistant</h3>
+                <p>Chat with our intelligent assistant to learn about symptoms, prevention, and general skin health
+                    advice.</p>
+                <a href="/chatbot"><button class="btn">Chat Now</button></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 DERMA AI Project. For educational purposes only.</p>
+    </div>
+</body>
+
+</html>

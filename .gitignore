@@ -1,0 +1,29 @@
+# Virtual Environments
+venv/
+.venv/
+
+# PyCache
+__pycache__/
+
+# Large Model Files
+*.pth
+*.safetensors
+*.h5
+local_model_directory/
+
+# User Uploads
+uploads/
+
+# Logs and Debug Outputs
+*.log
+debug_output*.txt
+gemini_error.txt
+error_log.txt
+verify_output.txt
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# OS Specific
+.DS_Store
+Thumbs.db

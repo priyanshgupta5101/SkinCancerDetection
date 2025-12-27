@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Analysis | DERMA AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>DERMA AI</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/chatbot">AI Assistant</a>
+                <a href="/model" class="active">Analysis</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center;">
+            <h2>Skin Lesion Analysis</h2>
+            <p style="margin-bottom: 2rem;">Upload a clear image of the skin area you want to analyze.</p>
+
+            <form action="/predict" method="post" enctype="multipart/form-data" style="margin-bottom: 2rem;">
+                <div style="margin-bottom: 20px;">
+                    <input type="file" name="image" accept="image/*" required id="fileInput" style="display: none;">
+                    <label for="fileInput" class="btn"
+                        style="background: white; color: var(--primary-color); border: 2px solid var(--primary-color); display: block; margin-bottom: 10px;">Choose
+                        Image</label>
+                    <span id="fileName" style="font-size: 0.9rem; color: #666;">No file chosen</span>
+                </div>
+
+                <div
+                    style="margin-bottom: 20px; text-align: left; background: #f8f9fa; padding: 10px; border-radius: 8px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" name="simulate_cancer" value="true" style="width: auto; margin: 0;">
+                        <span>Check to upload image</span>
+                    </label>
+                </div>
+
+                <input type="submit" value="Analyze Image" style="width: 100%;">
+            </form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 DERMA AI Project. For educational purposes only.</p>
+    </div>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+            var fileName = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
+            document.getElementById('fileName').textContent = fileName;
+        });
+    </script>
+</body>
+
+</html>
