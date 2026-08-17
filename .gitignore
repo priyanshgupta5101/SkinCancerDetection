@@ -1,0 +1,8 @@
+node_modules/
+vendor/
+.env
+ml_service/venv/
+ml_service/__pycache__/
+public/uploads/scans/*
+!public/uploads/scans/.gitkeep
+.DS_Store

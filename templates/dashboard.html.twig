@@ -1,0 +1,238 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Dashboard - {{ app_name }}{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-primary text-white">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <div>
+                        <h2 class="mb-1">Welcome back, {{ user_name }}!</h2>
+                        <p class="mb-0 opacity-75">Track your skin health journey</p>
+                    </div>
+                    <a href="{{ app_url }}/scan.php" class="btn btn-light btn-lg mt-3 mt-md-0">
+                        <i class="fas fa-camera me-2"></i>Start New Scan
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Total Scans</p>
+                        <h3 class="mb-0">{{ total_scans }}</h3>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-microscope fa-2x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Last Scan</p>
+                        <h3 class="mb-0">
+                            {% if scans %}
+                                {{ scans[0].created_at|date("M d") }}
+                            {% else %}
+                                Never
+                            {% endif %}
+                        </h3>
+                    </div>
+                    <div class="bg-info bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-calendar fa-2x text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Risk Alerts</p>
+                        <h3 class="mb-0">
+                            {% set highRiskCount = 0 %}
+                            {% for scan in scans %}
+                                {% if scan.risk_level == 'High' %}{% set highRiskCount = highRiskCount + 1 %}{% endif %}
+                            {% endfor %}
+                            {{ highRiskCount }}
+                        </h3>
+                    </div>
+                    <div class="bg-danger bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Scans -->
+    <div class="col-lg-8 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0"><i class="fas fa-history me-2 text-primary"></i>Recent Scans</h5>
+                <a href="{{ app_url }}/history.php" class="btn btn-sm btn-outline-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if scans %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Classification</th>
+                                <th>Risk</th>
+                                <th>Confidence</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for scan in scans %}
+                            <tr>
+                                <td>{{ scan.created_at|date("M d, Y") }}</td>
+                                <td>{{ scan.classification }}</td>
+                                <td>
+                                    <span class="badge bg-{% if scan.risk_level == 'High' %}danger{% elseif scan.risk_level == 'Medium' %}warning{% else %}success{% endif %}">
+                                        {{ scan.risk_level }}
+                                    </span>
+                                </td>
+                                <td>{{ scan.confidence }}%</td>
+                                <td>
+                                    <a href="{{ app_url }}/result.php?scan_id={{ scan.scan_id }}" class="btn btn-sm btn-outline-primary">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-camera fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No scans yet. Start your first scan today!</p>
+                    <a href="{{ app_url }}/scan.php" class="btn btn-primary">
+                        <i class="fas fa-camera me-2"></i>Start Scan
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Risk Distribution -->
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="fas fa-chart-pie me-2 text-primary"></i>Risk Distribution</h5>
+            </div>
+            <div class="card-body">
+                {% if risk_distribution %}
+                <div class="d-flex flex-column gap-3">
+                    {% for item in risk_distribution %}
+                    <div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="{% if item.risk_level == 'High' %}risk-high{% elseif item.risk_level == 'Medium' %}risk-medium{% else %}risk-low{% endif %}">
+                                {{ item.risk_level }} Risk
+                            </span>
+                            <span>{{ item.count }}</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-{% if item.risk_level == 'High' %}danger{% elseif item.risk_level == 'Medium' %}warning{% else %}success{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ (item.count / total_scans) * 100 }}%">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <p class="text-muted">No data available</p>
+                </div>
+                {% endif %}
+                
+                <hr class="my-4">
+                
+                <h6 class="mb-3">Quick Actions</h6>
+                <div class="d-grid gap-2">
+                    <a href="{{ app_url }}/compare.php" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-exchange-alt me-2"></i>Compare Scans
+                    </a>
+                    <a href="{{ app_url }}/doctors.php" class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-user-md me-2"></i>Find a Doctor
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Health Tips -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="fas fa-lightbulb me-2 text-warning"></i>Skin Health Tips</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-start">
+                            <div class="bg-info bg-opacity-10 p-2 rounded me-3">
+                                <i class="fas fa-sun text-info"></i>
+                            </div>
+                            <div>
+                                <h6>Sun Protection</h6>
+                                <p class="small text-muted mb-0">Use SPF 30+ sunscreen daily, even on cloudy days.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-start">
+                            <div class="bg-warning bg-opacity-10 p-2 rounded me-3">
+                                <i class="fas fa-search text-warning"></i>
+                            </div>
+                            <div>
+                                <h6>Self-Exams</h6>
+                                <p class="small text-muted mb-0">Check your skin monthly for any changes or new moles.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-start">
+                            <div class="bg-success bg-opacity-10 p-2 rounded me-3">
+                                <i class="fas fa-user-md text-success"></i>
+                            </div>
+                            <div>
+                                <h6>Professional Checks</h6>
+                                <p class="small text-muted mb-0">See a dermatologist annually for full-body exams.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

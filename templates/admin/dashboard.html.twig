@@ -1,0 +1,262 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Admin Dashboard - {{ app_name }}{% endblock %}
+
+{% block content %}
+<!-- Admin Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1"><i class="fas fa-cog me-2 text-primary"></i>Admin Dashboard</h2>
+                <p class="text-muted mb-0">System overview and management</p>
+            </div>
+            <a href="{{ app_url }}/dashboard.php" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to User Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- System Health -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="fas fa-heartbeat me-2 text-primary"></i>System Health</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-{% if system_health.database == 'healthy' %}success{% else %}danger{% endif %} bg-opacity-10 p-3 rounded me-3">
+                                <i class="fas fa-database fa-lg text-{% if system_health.database == 'healthy' %}success{% else %}danger{% endif %}"></i>
+                            </div>
+                            <div>
+                                <p class="mb-0 text-muted small">Database</p>
+                                <span class="badge bg-{% if system_health.database == 'healthy' %}success{% else %}danger{% endif %}">
+                                    {{ system_health.database|title }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-{% if system_health.ml_service == 'healthy' %}success{% else %}danger{% endif %} bg-opacity-10 p-3 rounded me-3">
+                                <i class="fas fa-brain fa-lg text-{% if system_health.ml_service == 'healthy' %}success{% else %}danger{% endif %}"></i>
+                            </div>
+                            <div>
+                                <p class="mb-0 text-muted small">ML Service</p>
+                                <span class="badge bg-{% if system_health.ml_service == 'healthy' %}success{% else %}danger{% endif %}">
+                                    {{ system_health.ml_service|title }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-{% if system_health.storage == 'healthy' %}success{% elseif system_health.storage == 'warning' %}warning{% else %}danger{% endif %} bg-opacity-10 p-3 rounded me-3">
+                                <i class="fas fa-hdd fa-lg text-{% if system_health.storage == 'healthy' %}success{% elseif system_health.storage == 'warning' %}warning{% else %}danger{% endif %}"></i>
+                            </div>
+                            <div>
+                                <p class="mb-0 text-muted small">Storage</p>
+                                <span class="badge bg-{% if system_health.storage == 'healthy' %}success{% elseif system_health.storage == 'warning' %}warning{% else %}danger{% endif %}">
+                                    {{ system_health.storage|title }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-info bg-opacity-10 p-3 rounded me-3">
+                                <i class="fas fa-clock fa-lg text-info"></i>
+                            </div>
+                            <div>
+                                <p class="mb-0 text-muted small">Last Updated</p>
+                                <span class="small">{{ system_health.timestamp|date("H:i") }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Total Users</p>
+                        <h3 class="mb-0">{{ stats.users.total_users }}</h3>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-users fa-2x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Total Scans</p>
+                        <h3 class="mb-0">{{ stats.scans.total_scans }}</h3>
+                    </div>
+                    <div class="bg-success bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-microscope fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">High Risk Scans</p>
+                        <h3 class="mb-0 text-danger">{{ stats.scans.high_risk }}</h3>
+                    </div>
+                    <div class="bg-danger bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Unique Users</p>
+                        <h3 class="mb-0">{{ stats.scans.unique_users }}</h3>
+                    </div>
+                    <div class="bg-info bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-user-check fa-2x text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts & Analytics -->
+<div class="row mb-4">
+    <!-- Risk Distribution Chart -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="fas fa-chart-pie me-2 text-primary"></i>Risk Distribution</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="riskChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Classifications -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="fas fa-chart-bar me-2 text-primary"></i>Recent Classifications (7 days)</h6>
+            </div>
+            <div class="card-body">
+                {% if stats.recent_classifications %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Classification</th>
+                                <th class="text-end">Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in stats.recent_classifications %}
+                            <tr>
+                                <td>{{ item.classification }}</td>
+                                <td class="text-end">
+                                    <span class="badge bg-primary">{{ item.count }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-4">No data available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="fas fa-bolt me-2 text-warning"></i>Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-primary w-100" disabled>
+                            <i class="fas fa-users me-2"></i>Manage Users (Soon)
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-success w-100" disabled>
+                            <i class="fas fa-microscope me-2"></i>View All Scans (Soon)
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-info w-100" disabled>
+                            <i class="fas fa-user-md me-2"></i>Manage Doctors (Soon)
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-secondary w-100" disabled>
+                            <i class="fas fa-broom me-2"></i>Cleanup (Soon)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Risk Distribution Chart
+    const ctx = document.getElementById('riskChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ stats.risk_distribution.labels|json_encode|raw }},
+            datasets: [{
+                data: {{ stats.risk_distribution.data|json_encode|raw }},
+                backgroundColor: ['#d32f2f', '#f57c00', '#388e3c'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

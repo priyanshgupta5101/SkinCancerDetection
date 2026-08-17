@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ app_name }}{% endblock %}</title>
+    
+    <!-- MDBootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.1.0/mdb.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #00695c;
+            --secondary-color: #00897b;
+            --accent-color: #4db6ac;
+            --danger-color: #d32f2f;
+            --warning-color: #f57c00;
+            --success-color: #388e3c;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border: none;
+        }
+        
+        .risk-high {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+        
+        .risk-medium {
+            color: var(--warning-color);
+            font-weight: bold;
+        }
+        
+        .risk-low {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+        
+        .scan-upload-area {
+            border: 3px dashed #ccc;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .scan-upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(0, 105, 92, 0.05);
+        }
+        
+        .scan-upload-area.dragover {
+            border-color: var(--secondary-color);
+            background-color: rgba(0, 137, 123, 0.1);
+        }
+        
+        .focal-guide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .focal-guide::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .focal-guide::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .desktop-nav {
+                display: none;
+            }
+            .bottom-nav {
+                display: flex;
+            }
+            body {
+                padding-bottom: 70px;
+            }
+        }
+        
+        .comparison-slider {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .comparison-slider img {
+            width: 100%;
+            display: block;
+        }
+        
+        .admin-sidebar {
+            min-height: calc(100vh - 60px);
+            background: white;
+            border-right: 1px solid #e0e0e0;
+        }
+        
+        .scan-result-card {
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .disclaimer-box {
+            background-color: #fff3e0;
+            border-left: 4px solid var(--warning-color);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+            transform-origin: 50% 50%;
+        }
+    </style>
+    
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+    <!-- Desktop Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white desktop-nav shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ app_url }}/dashboard.php">
+                <i class="fas fa-heartbeat me-2"></i>{{ app_name }}
+            </a>
+            <button class="navbar-toggler" type="button" data-mdb-collapse-init data-mdb-target="#navbarNav" aria-expanded="false">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ app_url }}/dashboard.php">
+                            <i class="fas fa-home me-1"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ app_url }}/scan.php">
+                            <i class="fas fa-camera me-1"></i> New Scan
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ app_url }}/history.php">
+                            <i class="fas fa-history me-1"></i> My History
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ app_url }}/doctors.php">
+                            <i class="fas fa-user-md me-1"></i> Find Doctor
+                        </a>
+                    </li>
+                    {% if is_admin %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ app_url }}/admin/">
+                            <i class="fas fa-cog me-1"></i> Admin
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="userDropdown" role="button" data-mdb-toggle="dropdown" data-mdb-dropdown-init aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i> {{ user_name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="{{ app_url }}/profile.php">
+                                <i class="fas fa-id-card me-2"></i>Profile
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ app_url }}/logout.php">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="{% block main_class %}container py-4{% endblock %}">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav justify-content-around py-2">
+        <a href="{{ app_url }}/dashboard.php" class="text-center text-decoration-none text-dark">
+            <i class="fas fa-home d-block mb-1"></i>
+            <small>Home</small>
+        </a>
+        <a href="{{ app_url }}/scan.php" class="text-center text-decoration-none text-dark">
+            <i class="fas fa-camera d-block mb-1"></i>
+            <small>Scan</small>
+        </a>
+        <a href="{{ app_url }}/history.php" class="text-center text-decoration-none text-dark">
+            <i class="fas fa-history d-block mb-1"></i>
+            <small>History</small>
+        </a>
+        <a href="{{ app_url }}/profile.php" class="text-center text-decoration-none text-dark">
+            <i class="fas fa-user d-block mb-1"></i>
+            <small>Profile</small>
+        </a>
+    </nav>
+
+    <!-- MDBootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.1.0/mdb.umd.min.js"></script>
+    
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,171 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Find a Doctor - {{ app_name }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-2"><i class="fas fa-user-md me-2 text-primary"></i>Find a Dermatologist</h2>
+        <p class="text-muted">Connect with qualified skin health professionals</p>
+    </div>
+</div>
+
+<!-- Emergency Contact Card -->
+<div class="card border-danger mb-4">
+    <div class="card-header bg-danger text-white py-3">
+        <h5 class="mb-0"><i class="fas fa-phone-alt me-2"></i>Emergency Contact</h5>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <p class="mb-2">If you have concerns about a high-risk scan or urgent skin issues:</p>
+                <ul class="mb-0">
+                    <li>Contact your nearest emergency room immediately</li>
+                    <li>Call the Skin Cancer Foundation Hotline: <strong>1-800-952-6626</strong></li>
+                    <li>Do not wait for changes - seek professional help</li>
+                </ul>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="tel:911" class="btn btn-danger">
+                    <i class="fas fa-phone-alt me-2"></i>Call Emergency
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="" class="row align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Filter by City</label>
+                <select class="form-select" name="city" onchange="this.form.submit()">
+                    <option value="">All Cities</option>
+                    {% for city in cities %}
+                    <option value="{{ city }}" {% if selected_city == city %}selected{% endif %}>{{ city }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                {% if selected_city %}
+                <a href="{{ app_url }}/doctors.php" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-2"></i>Clear Filter
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Doctors List -->
+<div class="row">
+    {% for doctor in doctors %}
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded me-3">
+                            <i class="fas fa-user-md fa-2x text-primary"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1">{{ doctor.name }}</h5>
+                            <span class="badge bg-info">{{ doctor.specialty }}</span>
+                            {% if doctor.is_verified %}
+                            <span class="badge bg-success ms-1"><i class="fas fa-check-circle me-1"></i>Verified</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                {% if doctor.clinic_name %}
+                <p class="mb-2">
+                    <i class="fas fa-hospital me-2 text-muted"></i>{{ doctor.clinic_name }}
+                </p>
+                {% endif %}
+                
+                {% if doctor.address %}
+                <p class="mb-2">
+                    <i class="fas fa-map-marker-alt me-2 text-muted"></i>{{ doctor.address }}
+                </p>
+                {% endif %}
+                
+                <p class="mb-2">
+                    <i class="fas fa-city me-2 text-muted"></i>{{ doctor.city }}
+                </p>
+                
+                {% if doctor.phone %}
+                <p class="mb-2">
+                    <i class="fas fa-phone me-2 text-muted"></i>
+                    <a href="tel:{{ doctor.phone }}" class="text-decoration-none">{{ doctor.phone }}</a>
+                </p>
+                {% endif %}
+                
+                {% if doctor.email %}
+                <p class="mb-2">
+                    <i class="fas fa-envelope me-2 text-muted"></i>
+                    <a href="mailto:{{ doctor.email }}" class="text-decoration-none">{{ doctor.email }}</a>
+                </p>
+                {% endif %}
+                
+                {% if doctor.website %}
+                <p class="mb-0">
+                    <i class="fas fa-globe me-2 text-muted"></i>
+                    <a href="{{ doctor.website }}" target="_blank" class="text-decoration-none">Visit Website</a>
+                </p>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-white border-0 pt-0">
+                <div class="d-flex gap-2">
+                    {% if doctor.phone %}
+                    <a href="tel:{{ doctor.phone }}" class="btn btn-primary flex-grow-1">
+                        <i class="fas fa-phone-alt me-2"></i>Call Now
+                    </a>
+                    {% endif %}
+                    {% if doctor.email %}
+                    <a href="mailto:{{ doctor.email }}" class="btn btn-outline-primary">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="text-center py-5">
+            <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
+            <h5>No doctors found</h5>
+            <p class="text-muted">Try adjusting your filters or check back later.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Additional Resources -->
+<div class="card mt-4">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0"><i class="fas fa-book-medical me-2 text-primary"></i>Additional Resources</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <h6>Skin Cancer Foundation</h6>
+                <p class="small text-muted">Comprehensive information about skin cancer prevention, detection, and treatment.</p>
+                <a href="https://www.skincancer.org" target="_blank" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-external-link-alt me-2"></i>Visit Website
+                </a>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h6>American Academy of Dermatology</h6>
+                <p class="small text-muted">Find a dermatologist and access trusted skin health resources.</p>
+                <a href="https://www.aad.org" target="_blank" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-external-link-alt me-2"></i>Visit Website
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

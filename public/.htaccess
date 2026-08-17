@@ -1,0 +1,41 @@
+# DermScan AI - Apache Rewrite Rules
+
+# Enable rewrite engine
+RewriteEngine On
+
+# Protect sensitive files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Disable directory browsing
+Options -Indexes
+
+# PHP Settings (if using mod_php)
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+php_value max_execution_time 300
+
+# Protect config and source files
+<IfModule mod_rewrite.c>
+    RewriteRule ^(config|src|templates|ml_service|database)/ - [F,L]
+</IfModule>
+
+# Default charset
+AddDefaultCharset UTF-8
+
+# Compress text files
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Cache static assets
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType text/javascript "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+</IfModule>

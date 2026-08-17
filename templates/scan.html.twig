@@ -1,0 +1,259 @@
+{% extends "base.html.twig" %}
+
+{% block title %}New Scan - {{ app_name }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3"><i class="fas fa-camera me-2 text-primary"></i>New Skin Scan</h2>
+        <p class="text-muted">Upload a clear photo of the skin lesion for AI analysis</p>
+    </div>
+</div>
+
+{% if error %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+    <button type="button" class="btn-close" data-mdb-dismiss="alert"></button>
+</div>
+{% endif %}
+
+{% if not ml_healthy %}
+<div class="alert alert-warning" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <strong>Notice:</strong> AI analysis service is currently unavailable. Please try again later.
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">Upload Image</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="" enctype="multipart/form-data" id="scanForm">
+                    <!-- Upload Area -->
+                    <div class="scan-upload-area mb-4" id="dropZone">
+                        <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                        <h5>Drag & drop your image here</h5>
+                        <p class="text-muted">or click to browse</p>
+                        <input type="file" name="image" id="fileInput" accept="image/jpeg,image/png,image/jpg" 
+                               style="opacity: 0; position: absolute; z-index: -1;" required>
+                        <small class="text-muted d-block mt-2">Supported formats: JPEG, PNG (Max 10MB)</small>
+                    </div>
+                    
+                    <!-- Preview Area -->
+                    <div id="previewArea" class="d-none mb-4">
+                        <h6 class="mb-3">Selected Image:</h6>
+                        <img id="imagePreview" class="img-fluid rounded border" style="max-height: 300px;" alt="Preview">
+                    </div>
+                    
+                    <!-- Camera Option -->
+                    <div class="text-center mb-4">
+                        <span class="text-muted">or</span>
+                    </div>
+                    
+                    <div class="text-center mb-4">
+                        <button type="button" class="btn btn-outline-primary" id="cameraBtn" onclick="startCamera()">
+                            <i class="fas fa-camera me-2"></i>Use Camera
+                        </button>
+                    </div>
+                    
+                    <!-- Camera Area -->
+                    <div id="cameraArea" class="d-none mb-4">
+                        <div class="position-relative text-center bg-dark rounded overflow-hidden" style="max-height: 400px;">
+                            <video id="cameraVideo" autoplay playsinline class="w-100"></video>
+                            <div class="focal-guide"></div>
+                            <canvas id="cameraCanvas" class="d-none"></canvas>
+                        </div>
+                        <div class="d-flex justify-content-center gap-2 mt-3">
+                            <button type="button" class="btn btn-primary" onclick="capturePhoto()">
+                                <i class="fas fa-camera me-2"></i>Capture
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="stopCamera()">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Additional Info -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Body Location</label>
+                            <select class="form-select" name="body_location">
+                                <option value="">Select location...</option>
+                                <option value="face">Face</option>
+                                <option value="neck">Neck</option>
+                                <option value="chest">Chest</option>
+                                <option value="back">Back</option>
+                                <option value="arm_left">Left Arm</option>
+                                <option value="arm_right">Right Arm</option>
+                                <option value="leg_left">Left Leg</option>
+                                <option value="leg_right">Right Leg</option>
+                                <option value="hand">Hand</option>
+                                <option value="foot">Foot</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Notes (Optional)</label>
+                        <textarea class="form-control" name="notes" rows="3" 
+                                  placeholder="Any additional information about this lesion..."></textarea>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" {% if not ml_healthy %}disabled{% endif %}>
+                            <i class="fas fa-microscope me-2"></i>Analyze Lesion
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="fas fa-info-circle me-2 text-info"></i>Tips for Best Results</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                        <span>Ensure good lighting - use natural daylight if possible</span>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                        <span>Keep the camera 4-6 inches from the lesion</span>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                        <span>Center the lesion in the frame</span>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                        <span>Include some surrounding skin for context</span>
+                    </li>
+                    <li class="d-flex align-items-start">
+                        <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                        <span>Avoid shadows and reflections</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="disclaimer-box">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Important:</strong> This AI analysis is for informational purposes only and does not replace professional medical diagnosis. Always consult a dermatologist for proper evaluation.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const previewArea = document.getElementById('previewArea');
+    const imagePreview = document.getElementById('imagePreview');
+    const cameraVideo = document.getElementById('cameraVideo');
+    const cameraCanvas = document.getElementById('cameraCanvas');
+    let stream = null;
+
+    // Drag and drop
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+    
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFile(e.target.files[0]);
+        }
+    });
+    
+    function handleFile(file) {
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            return;
+        }
+        
+        if (file.size > 10 * 1024 * 1024) {
+            alert('File size must be less than 10MB');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            imagePreview.src = e.target.result;
+            previewArea.classList.remove('d-none');
+            dropZone.classList.add('d-none');
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: 'environment' } 
+            });
+            cameraVideo.srcObject = stream;
+            document.getElementById('cameraArea').classList.remove('d-none');
+            document.getElementById('cameraBtn').classList.add('d-none');
+            dropZone.classList.add('d-none');
+        } catch (err) {
+            alert('Could not access camera. Please check permissions.');
+            console.error('Camera error:', err);
+        }
+    }
+    
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        document.getElementById('cameraArea').classList.add('d-none');
+        document.getElementById('cameraBtn').classList.remove('d-none');
+        dropZone.classList.remove('d-none');
+    }
+    
+    function capturePhoto() {
+        cameraCanvas.width = cameraVideo.videoWidth;
+        cameraCanvas.height = cameraVideo.videoHeight;
+        const ctx = cameraCanvas.getContext('2d');
+        ctx.drawImage(cameraVideo, 0, 0);
+        
+        cameraCanvas.toBlob((blob) => {
+            const file = new File([blob], 'camera_capture.jpg', { type: 'image/jpeg' });
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+            
+            imagePreview.src = cameraCanvas.toDataURL('image/jpeg');
+            previewArea.classList.remove('d-none');
+            stopCamera();
+        }, 'image/jpeg');
+    }
+</script>
+{% endblock %}

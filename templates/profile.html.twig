@@ -1,0 +1,212 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Profile - {{ app_name }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-2"><i class="fas fa-user-circle me-2 text-primary"></i>My Profile</h2>
+        <p class="text-muted">Manage your account and medical information</p>
+    </div>
+</div>
+
+{% if success %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="fas fa-check-circle me-2"></i>{{ success }}
+    <button type="button" class="btn-close" data-mdb-dismiss="alert"></button>
+</div>
+{% endif %}
+
+{% if error %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+    <button type="button" class="btn-close" data-mdb-dismiss="alert"></button>
+</div>
+{% endif %}
+
+<div class="row">
+    <!-- Profile Form -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="fas fa-id-card me-2 text-primary"></i>Personal Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-outline">
+                                <input type="text" id="firstName" name="first_name" class="form-control" 
+                                       value="{{ profile.first_name }}" required>
+                                <label class="form-label active" for="firstName">First Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-outline">
+                                <input type="text" id="lastName" name="last_name" class="form-control" 
+                                       value="{{ profile.last_name }}" required>
+                                <label class="form-label active" for="lastName">Last Name</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-outline mb-4">
+                        <input type="email" id="email" class="form-control" value="{{ profile.email }}" disabled>
+                        <label class="form-label active" for="email">Email Address</label>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-outline">
+                                <input type="number" id="age" name="age" class="form-control" 
+                                       value="{{ profile.age }}" min="1" max="120">
+                                <label class="form-label active" for="age">Age</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Skin Type</label>
+                            <select class="form-select" name="skin_type">
+                                <option value="fair" {% if profile.skin_type == 'fair' %}selected{% endif %}>Fair</option>
+                                <option value="medium" {% if profile.skin_type == 'medium' %}selected{% endif %}>Medium</option>
+                                <option value="olive" {% if profile.skin_type == 'olive' %}selected{% endif %}>Olive</option>
+                                <option value="brown" {% if profile.skin_type == 'brown' %}selected{% endif %}>Brown</option>
+                                <option value="dark" {% if profile.skin_type == 'dark' %}selected{% endif %}>Dark</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h6 class="mb-3"><i class="fas fa-notes-medical me-2 text-info"></i>Medical History</h6>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="familyHistory" name="family_history"
+                               {% if profile.family_history %}checked{% endif %}>
+                        <label class="form-check-label" for="familyHistory">
+                            Family history of skin cancer
+                        </label>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h6 class="mb-3"><i class="fas fa-shield-alt me-2 text-success"></i>Privacy Settings</h6>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="privacyOptIn" name="privacy_opt_in"
+                               {% if profile.privacy_opt_in %}checked{% endif %}>
+                        <label class="form-check-label" for="privacyOptIn">
+                            Allow my anonymized data to be used for AI model improvement
+                        </label>
+                    </div>
+                    <p class="small text-muted ms-4">
+                        This helps us improve our AI accuracy while keeping your personal information completely anonymous.
+                    </p>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Account Info -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="fas fa-info-circle me-2 text-primary"></i>Account Information</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-2">
+                    <strong>Member Since:</strong><br>
+                    <span class="text-muted">{{ profile.created_at|date("F d, Y") }}</span>
+                </p>
+                <p class="mb-0">
+                    <strong>Account Type:</strong><br>
+                    <span class="badge bg-{% if is_admin %}danger{% else %}primary{% endif %}">
+                        {% if is_admin %}Administrator{% else %}Standard User{% endif %}
+                    </span>
+                </p>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="fas fa-lock me-2 text-warning"></i>Security</h6>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-3">Change your password regularly to keep your account secure.</p>
+                <button class="btn btn-outline-secondary btn-sm w-100" disabled>
+                    <i class="fas fa-key me-2"></i>Change Password (Coming Soon)
+                </button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="fas fa-download me-2 text-info"></i>Data Export</h6>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-3">Download all your scan history and personal data.</p>
+                <button class="btn btn-outline-info btn-sm w-100" disabled>
+                    <i class="fas fa-file-export me-2"></i>Export My Data (Coming Soon)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Danger Zone -->
+<div class="card border-danger mt-4">
+    <div class="card-header bg-danger text-white py-3">
+        <h6 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Danger Zone</h6>
+    </div>
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h6 class="mb-1">Delete Account</h6>
+                <p class="small text-muted mb-0">This action cannot be undone. All your data will be permanently removed.</p>
+            </div>
+            <button class="btn btn-outline-danger" disabled>
+                <i class="fas fa-trash-alt me-2"></i>Delete Account
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize MDB inputs to fix label overlap
+    document.querySelectorAll('.form-outline').forEach((formOutline) => {
+        if (typeof mdb !== 'undefined' && mdb.Input) {
+            new mdb.Input(formOutline).init();
+        }
+    });
+
+    // Fix MDB label overlap for pre-filled or auto-filled inputs
+    setTimeout(() => {
+        document.querySelectorAll('.form-outline input').forEach(input => {
+            if (input.value !== '') {
+                const label = input.nextElementSibling;
+                if (label && label.classList.contains('form-label')) {
+                    label.classList.add('active');
+                }
+            }
+        });
+    }, 100);
+
+    // Auto-dismiss success alerts after 5 seconds
+    setTimeout(() => {
+        document.querySelectorAll('.alert-success').forEach(alert => {
+            alert.classList.remove('show');
+            setTimeout(() => alert.remove(), 150);
+        });
+    }, 5000);
+});
+</script>
+{% endblock %}

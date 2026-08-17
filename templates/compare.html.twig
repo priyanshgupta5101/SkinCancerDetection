@@ -1,0 +1,183 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Compare Scans - {{ app_name }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-2"><i class="fas fa-exchange-alt me-2 text-primary"></i>Compare Scans</h2>
+        <p class="text-muted">Compare two scans side-by-side to track changes over time</p>
+    </div>
+</div>
+
+{% if error %}
+<div class="alert alert-danger" role="alert">
+    <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+</div>
+{% endif %}
+
+<!-- Scan Selection -->
+<div class="card mb-4">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0">Select Scans to Compare</h5>
+    </div>
+    <div class="card-body">
+        <form method="GET" action="">
+            <div class="row">
+                <div class="col-md-5">
+                    <label class="form-label">First Scan</label>
+                    <select class="form-select" name="scan1" required>
+                        <option value="">Choose a scan...</option>
+                        {% for scan in scans %}
+                        <option value="{{ scan.scan_id }}" {% if selected_scan1 == scan.scan_id %}selected{% endif %}>
+                            {{ scan.created_at|date("M d, Y") }} - {{ scan.classification }} ({{ scan.risk_level }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end justify-content-center py-2">
+                    <i class="fas fa-exchange-alt fa-2x text-muted"></i>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">Second Scan</label>
+                    <select class="form-select" name="scan2" required>
+                        <option value="">Choose a scan...</option>
+                        {% for scan in scans %}
+                        <option value="{{ scan.scan_id }}" {% if selected_scan2 == scan.scan_id %}selected{% endif %}>
+                            {{ scan.created_at|date("M d, Y") }} - {{ scan.classification }} ({{ scan.risk_level }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="mt-4 text-center">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-balance-scale me-2"></i>Compare Scans
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Comparison Results -->
+{% if comparison and comparison.success %}
+<div class="card mb-4 border-primary">
+    <div class="card-header bg-primary text-white py-3">
+        <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Analysis Summary</h5>
+    </div>
+    <div class="card-body">
+        <div class="row text-center">
+            <div class="col-md-3 mb-3">
+                <h6 class="text-muted">Time Difference</h6>
+                <h4>{{ comparison.analysis.days_difference }} days</h4>
+            </div>
+            <div class="col-md-3 mb-3">
+                <h6 class="text-muted">Risk Change</h6>
+                <h4 class="{% if comparison.analysis.risk_change > 0 %}text-danger{% elseif comparison.analysis.risk_change < 0 %}text-success{% else %}text-muted{% endif %}">
+                    {{ comparison.analysis.risk_change_text }}
+                </h4>
+            </div>
+            <div class="col-md-3 mb-3">
+                <h6 class="text-muted">Confidence Change</h6>
+                <h4 class="{% if comparison.analysis.confidence_change > 0 %}text-success{% elseif comparison.analysis.confidence_change < 0 %}text-danger{% else %}text-muted{% endif %}">
+                    {{ comparison.analysis.confidence_change > 0 ? '+' : '' }}{{ comparison.analysis.confidence_change }}%
+                </h4>
+            </div>
+            <div class="col-md-3 mb-3">
+                <h6 class="text-muted">Recommendation</h6>
+                <span class="badge bg-{% if comparison.analysis.risk_change > 0 %}danger{% else %}info{% endif %} p-2">
+                    {{ comparison.analysis.recommendation|slice(0, 30) }}...
+                </span>
+            </div>
+        </div>
+        <div class="alert alert-info mt-3 mb-0">
+            <i class="fas fa-info-circle me-2"></i>{{ comparison.analysis.recommendation }}
+        </div>
+    </div>
+</div>
+
+<!-- Side by Side Comparison -->
+<div class="row">
+    {% set scan_items = [comparison.scan1, comparison.scan2] %}
+    {% for scan in scan_items %}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 {% if loop.index == 1 %}border-start-4{% else %}border-end-4{% endif %}" 
+             style="border-{% if loop.index == 1 %}left{% else %}right{% endif %}-color: {% if scan.risk_level == 'High' %}#d32f2f{% elseif scan.risk_level == 'Medium' %}#f57c00{% else %}#388e3c{% endif %}!important;">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">
+                    {% if loop.index == 1 %}<i class="fas fa-calendar me-2"></i>Earlier{% else %}<i class="fas fa-calendar-check me-2"></i>Later{% endif %}
+                </h6>
+                <span class="badge bg-{% if scan.risk_level == 'High' %}danger{% elseif scan.risk_level == 'Medium' %}warning{% else %}success{% endif %}">
+                    {{ scan.risk_level }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <img src="{{ app_url }}/{{ scan.image_path }}" 
+                         class="img-fluid rounded border" 
+                         alt="Scan {{ loop.index }}"
+                         style="max-height: 250px;">
+                </div>
+                
+                <table class="table table-sm">
+                    <tr>
+                        <td class="text-muted">Date:</td>
+                        <td class="text-end">{{ scan.created_at|date("M d, Y") }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Classification:</td>
+                        <td class="text-end">{{ scan.classification }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Confidence:</td>
+                        <td class="text-end">{{ scan.confidence }}%</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Location:</td>
+                        <td class="text-end">{% if scan.body_location %}{{ scan.body_location|replace({'_': ' '})|title }}{% else %}-{% endif %}</td>
+                    </tr>
+                </table>
+                
+                <a href="{{ app_url }}/result.php?scan_id={{ scan.scan_id }}" class="btn btn-outline-primary btn-sm w-100">
+                    <i class="fas fa-eye me-2"></i>View Full Details
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Export Options -->
+<div class="card">
+    <div class="card-body">
+        <h6 class="mb-3">Export Comparison</h6>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary" onclick="window.print()">
+                <i class="fas fa-print me-2"></i>Print Report
+            </button>
+            <a href="{{ app_url }}/doctors.php" class="btn btn-outline-info">
+                <i class="fas fa-user-md me-2"></i>Share with Doctor
+            </a>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- Help Text -->
+<div class="card">
+    <div class="card-body">
+        <div class="text-center py-4">
+            <i class="fas fa-balance-scale fa-3x text-muted mb-3"></i>
+            <h5>How Comparison Works</h5>
+            <p class="text-muted">Select two scans from your history to compare them side-by-side. This helps you track how lesions change over time.</p>
+            <ul class="list-unstyled text-start d-inline-block">
+                <li><i class="fas fa-check text-success me-2"></i>Visual comparison of lesion images</li>
+                <li><i class="fas fa-check text-success me-2"></i>Risk level tracking</li>
+                <li><i class="fas fa-check text-success me-2"></i>Confidence score changes</li>
+                <li><i class="fas fa-check text-success me-2"></i>Time-based analysis</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

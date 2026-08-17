@@ -1,0 +1,186 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Scan History - {{ app_name }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="mb-2"><i class="fas fa-history me-2 text-primary"></i>Scan History</h2>
+        <p class="text-muted">View all your past skin scans and track changes over time</p>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <a href="{{ app_url }}/scan.php" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>New Scan
+        </a>
+        <a href="{{ app_url }}/compare.php" class="btn btn-outline-primary">
+            <i class="fas fa-exchange-alt me-2"></i>Compare
+        </a>
+    </div>
+</div>
+
+<!-- History Table -->
+<div class="card">
+    <div class="card-header bg-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">All Scans ({{ total }})</h5>
+            <div class="btn-group">
+                <button class="btn btn-sm btn-outline-secondary" onclick="filterScans('all')">All</button>
+                <button class="btn btn-sm btn-outline-danger" onclick="filterScans('High')">High Risk</button>
+                <button class="btn btn-sm btn-outline-warning" onclick="filterScans('Medium')">Medium</button>
+                <button class="btn btn-sm btn-outline-success" onclick="filterScans('Low')">Low</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        {% if scans %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="historyTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Image</th>
+                        <th>Date</th>
+                        <th>Location</th>
+                        <th>Classification</th>
+                        <th>Risk</th>
+                        <th>Confidence</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for scan in scans %}
+                    <tr data-risk="{{ scan.risk_level|default('Pending') }}">
+                        <td>
+                            <img src="{{ app_url }}/{{ scan.image_path }}" 
+                                 alt="Scan" 
+                                 class="rounded"
+                                 style="width: 60px; height: 60px; object-fit: cover;">
+                        </td>
+                        <td>
+                            <span class="d-block">{{ scan.created_at|date("M d, Y") }}</span>
+                            <small class="text-muted">{{ scan.created_at|date("h:i A") }}</small>
+                        </td>
+                        <td>
+                            {% if scan.body_location %}
+                                {{ scan.body_location|replace({'_': ' '})|title }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        {% if scan.status == 'COMPLETED' %}
+                        <td>{{ scan.classification }}</td>
+                        <td>
+                            <span class="badge bg-{% if scan.risk_level == 'High' %}danger{% elseif scan.risk_level == 'Medium' %}warning{% else %}success{% endif %}">
+                                {{ scan.risk_level }}
+                            </span>
+                        </td>
+                        <td>{{ (scan.confidence * 100)|round(1) }}%</td>
+                        {% elseif scan.status == 'FAILED' %}
+                        <td colspan="3"><span class="badge bg-danger">Analysis Failed</span></td>
+                        {% else %}
+                        <td colspan="3"><span class="badge bg-secondary"><i class="fas fa-spinner fa-spin me-1"></i>{{ scan.status|default('PROCESSING') }}</span></td>
+                        {% endif %}
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{ app_url }}/result.php?scan_id={{ scan.scan_id }}" 
+                                   class="btn btn-sm btn-outline-primary" 
+                                   title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ app_url }}/compare.php?scan1={{ scan.scan_id }}" 
+                                   class="btn btn-sm btn-outline-info {% if scan.status != 'COMPLETED' %}disabled{% endif %}" 
+                                   title="Compare">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </a>
+                                <button type="button" 
+                                        class="btn btn-sm btn-outline-danger" 
+                                        onclick="confirmDelete({{ scan.id }})"
+                                        title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if totalPages > 1 %}
+        <nav class="p-3">
+            <ul class="pagination justify-content-center mb-0">
+                <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="?page={{ page - 1 }}">Previous</a>
+                </li>
+                
+                {% for i in 1..totalPages %}
+                <li class="page-item {% if i == page %}active{% endif %}">
+                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                </li>
+                {% endfor %}
+                
+                <li class="page-item {% if page == totalPages %}disabled{% endif %}">
+                    <a class="page-link" href="?page={{ page + 1 }}">Next</a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+            <h5>No scans found</h5>
+            <p class="text-muted">Start your skin health journey by taking your first scan.</p>
+            <a href="{{ app_url }}/scan.php" class="btn btn-primary">
+                <i class="fas fa-camera me-2"></i>Start First Scan
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this scan? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Cancel</button>
+                <form method="POST" action="" class="d-inline">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="scan_id" id="deleteScanId">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    function filterScans(risk) {
+        const rows = document.querySelectorAll('#historyTable tbody tr');
+        rows.forEach(row => {
+            if (risk === 'all' || row.dataset.risk === risk) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    function confirmDelete(scanId) {
+        document.getElementById('deleteScanId').value = scanId;
+        const modal = new mdb.Modal(document.getElementById('deleteModal'));
+        modal.show();
+    }
+</script>
+{% endblock %}

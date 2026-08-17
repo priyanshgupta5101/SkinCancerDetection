@@ -1,0 +1,221 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Login - {{ app_name }}{% endblock %}
+
+{% block main_class %}container-fluid{% endblock %}
+
+{% block content %}
+<div class="row min-vh-100 align-items-center">
+    <div class="col-lg-6 d-none d-lg-block bg-light" style="background: linear-gradient(135deg, #00695c 0%, #00897b 100%); min-height: 100vh;">
+        <div class="d-flex flex-column justify-content-center align-items-center h-100 text-white p-5">
+            <i class="fas fa-heartbeat fa-5x mb-4"></i>
+            <h1 class="display-4 fw-bold mb-3">{{ app_name }}</h1>
+            <p class="lead">Smart Skin Health & Lesion Analysis</p>
+            <div class="mt-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-check-circle me-3 fa-lg"></i>
+                    <span>AI-Powered Analysis</span>
+                </div>
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-check-circle me-3 fa-lg"></i>
+                    <span>Track Changes Over Time</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle me-3 fa-lg"></i>
+                    <span>Connect with Dermatologists</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="text-center mb-4 d-lg-none">
+                        <i class="fas fa-heartbeat fa-3x text-primary mb-2"></i>
+                        <h2 class="fw-bold">{{ app_name }}</h2>
+                    </div>
+                    
+                    {% if error %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+                        <button type="button" class="btn-close" data-mdb-dismiss="alert"></button>
+                    </div>
+                    {% endif %}
+                    
+                    {% if success %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>{{ success }}
+                        <button type="button" class="btn-close" data-mdb-dismiss="alert"></button>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Pills navs -->
+                    <ul class="nav nav-pills nav-justified mb-4" id="ex1" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link {% if active_tab|default('login') == 'login' %}active{% endif %}" id="tab-login" data-mdb-toggle="pill" href="#pills-login" role="tab">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link {% if active_tab|default('login') == 'register' %}active{% endif %}" id="tab-register" data-mdb-toggle="pill" href="#pills-register" role="tab">
+                                <i class="fas fa-user-plus me-2"></i>Register
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <!-- Pills content -->
+                    <div class="tab-content">
+                        <!-- Login Tab -->
+                        <div class="tab-pane fade {% if active_tab|default('login') == 'login' %}show active{% endif %}" id="pills-login" role="tabpanel">
+                            <form method="POST" action="" autocomplete="off">
+                                <input type="hidden" name="action" value="login">
+                                
+                                <div class="form-outline mb-4">
+                                    <input type="email" id="loginEmail" name="email" class="form-control" required>
+                                    <label class="form-label" for="loginEmail">Email address</label>
+                                </div>
+                                
+                                <div class="form-outline mb-4">
+                                    <input type="password" id="loginPassword" name="password" class="form-control" required>
+                                    <label class="form-label" for="loginPassword">Password</label>
+                                </div>
+                                
+                                <div class="row mb-4">
+                                    <div class="col-md-6 d-flex justify-content-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="rememberMe" name="remember">
+                                            <label class="form-check-label" for="rememberMe">Remember me</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 d-flex justify-content-center">
+                                        <a href="#" class="text-decoration-none">Forgot password?</a>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary btn-block mb-4">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Sign in
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Register Tab -->
+                        <div class="tab-pane fade {% if active_tab|default('login') == 'register' %}show active{% endif %}" id="pills-register" role="tabpanel">
+                            <form method="POST" action="" autocomplete="off">
+                                <input type="hidden" name="action" value="register">
+                                
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <div class="form-outline">
+                                            <input type="text" id="firstName" name="first_name" class="form-control" value="{{ old.first_name|default('') }}" required>
+                                            <label class="form-label" for="firstName">First Name</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-outline">
+                                            <input type="text" id="lastName" name="last_name" class="form-control" value="{{ old.last_name|default('') }}" required>
+                                            <label class="form-label" for="lastName">Last Name</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-outline mb-4">
+                                    <input type="email" id="registerEmail" name="email" class="form-control" value="{{ old.email|default('') }}" required>
+                                    <label class="form-label" for="registerEmail">Email address</label>
+                                </div>
+                                
+                                <div class="form-outline mb-4">
+                                    <input type="password" id="registerPassword" name="password" class="form-control" required minlength="8">
+                                    <label class="form-label" for="registerPassword">Password (min 8 characters)</label>
+                                </div>
+                                
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <div class="form-outline">
+                                            <input type="number" id="age" name="age" class="form-control" value="{{ old.age|default('') }}" min="1" max="120">
+                                            <label class="form-label" for="age">Age</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select class="form-select" name="skin_type" aria-label="Skin Type">
+                                            <option value="fair" {% if old.skin_type|default('medium') == 'fair' %}selected{% endif %}>Fair</option>
+                                            <option value="medium" {% if old.skin_type|default('medium') == 'medium' %}selected{% endif %}>Medium</option>
+                                            <option value="olive" {% if old.skin_type|default('medium') == 'olive' %}selected{% endif %}>Olive</option>
+                                            <option value="brown" {% if old.skin_type|default('medium') == 'brown' %}selected{% endif %}>Brown</option>
+                                            <option value="dark" {% if old.skin_type|default('medium') == 'dark' %}selected{% endif %}>Dark</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="familyHistory" name="family_history">
+                                    <label class="form-check-label" for="familyHistory">
+                                        Family history of skin cancer
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" id="privacyOptIn" name="privacy_opt_in" checked>
+                                    <label class="form-check-label" for="privacyOptIn">
+                                        I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                                    </label>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary btn-block mb-4">
+                                    <i class="fas fa-user-plus me-2"></i>Sign up
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize MDB inputs to fix label overlap
+    document.querySelectorAll('.form-outline').forEach((formOutline) => {
+        if (typeof mdb !== 'undefined' && mdb.Input) {
+            new mdb.Input(formOutline).init();
+        }
+    });
+
+    // Fix MDB label overlap for pre-filled or auto-filled inputs
+    setTimeout(() => {
+        document.querySelectorAll('.form-outline input').forEach(input => {
+            if (input.value !== '') {
+                const label = input.nextElementSibling;
+                if (label && label.classList.contains('form-label')) {
+                    label.classList.add('active');
+                }
+            }
+        });
+    }, 100);
+
+    const triggerTabList = document.querySelectorAll('#ex1 a[data-mdb-toggle="pill"]');
+    triggerTabList.forEach(function (triggerEl) {
+        triggerEl.addEventListener('click', function (event) {
+            event.preventDefault();
+            
+            // Remove active classes
+            document.querySelectorAll('#ex1 a').forEach(function(el) {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-pane').forEach(function(el) {
+                el.classList.remove('show', 'active');
+            });
+            
+            // Add active classes to current
+            this.classList.add('active');
+            const target = document.querySelector(this.getAttribute('href'));
+            if(target) {
+                target.classList.add('show', 'active');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}
